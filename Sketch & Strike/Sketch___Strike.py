@@ -1,4 +1,11 @@
+#other files
+from Button import Button
+from PasswordBox import PasswordBox
+from GameFunctions import AskPassword, MainMenu, PlayerMovement
+import Server
+import Client
 
+#libraries
 import pygame
 import pymunk
 import sys
@@ -14,32 +21,34 @@ display = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption("Sketch & Strike")
 clock = pygame.time.Clock()
 
-
-
 # Main game loop
 running = True
-
 x, y = 100, 100
 speed = 5
+
+passwordBox = PasswordBox(250, 250, 300, 50, pygame.Color("gray"), pygame.font)
+hostButton = Button(300, 200, 200, 60, "Host Game", pygame.Color("gray"), pygame.Color("darkgray"), lambda: AskPassword(display, passwordBox))
+joinButton = Button(300, 300, 200, 60, "Join Game", pygame.Color("gray"), pygame.Color("darkgray"), lambda: AskPassword(display, passwordBox))
+buttons = [hostButton, joinButton]
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP] and y >= 0:
-        y -= speed
-    if keys[pygame.K_DOWN] and y <= window_height - size_of_square:
-        y += speed
-    if keys[pygame.K_LEFT] and x >= 0:
-        x -= speed
-    if keys[pygame.K_RIGHT] and x <= window_width - size_of_square:
-        x += speed
+        for button in buttons:
+            button.handle_event(event)
+
+    
 
     display.fill((255, 255, 255))
 
-    pygame.draw.rect(display, (0, 128, 255), pygame.Rect(x, y, size_of_square, size_of_square))
+
+    #change button events so that when clicked it just changes a variable
+    #then if that variable is true, display the password box instead of the main menu
+    MainMenu(display, buttons)
+
+    PlayerMovement(display, x, y, speed, window_height, window_width, size_of_square)
 
     # Update the display/space and maintain fps
     pygame.display.flip()
