@@ -8,8 +8,11 @@ class Network:
         self.server = "" #keep consistent with server
         self.port =5555
         self.addr = (self.server, self.port)
-        self.id = self.connect()
-        print(self.id)
+        self.pos = self.connect()
+        #print(self.pos)
+
+    def getPos(self):
+        self.pos
 
     def connect(self):
         try:
