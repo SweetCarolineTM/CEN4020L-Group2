@@ -1,7 +1,6 @@
 import socket
 from _thread import *
 import sys
-from tkinter import CURRENT
 
 #first, run this server script in order to run endless client scripts
 
@@ -57,9 +56,12 @@ def threaded_client(conn, player):
 
 currentPlayer = 0
 while True:
-    if (currentPlayer < 2):
-        conn, addr = s.accept()
-        print("Connected to:", addr)
+    conn, addr = s.accept()
+    print("Connected to:", addr)
 
-        start_new_thread(threaded_client, (conn, currentPlayer))
-        currentPlayer += 1
+    start_new_thread(threaded_client, (conn, currentPlayer))
+    currentPlayer += 1
+
+
+def hostGame():
+    pass #work on later

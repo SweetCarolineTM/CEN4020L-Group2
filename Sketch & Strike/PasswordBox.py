@@ -1,12 +1,11 @@
 import pygame
 
 class PasswordBox:
-    def __init__(self, x, y, width, height, color, font, placeholder, mask_char="*"):
+    def __init__(self, x, y, width, height, color, font, mask_char="*"):
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
         self.font = font
         self.text = ""
-        self.placeholder = placeholder
         self.mask_char = mask_char
         self.active = False
 
@@ -17,10 +16,7 @@ class PasswordBox:
         
         # Mask password and render text
         font = pygame.font.Font(None, 36)
-        if (self.text):
-            text_surface = font.render(self.mask_char * len(self.text), True, pygame.Color("black"))
-        else:
-            text_surface = font.render(self.placeholder, True, pygame.Color("gray"))
+        text_surface = font.render(self.mask_char * len(self.text), True, pygame.Color("black"))
         
         # Draw the text
         screen.blit(text_surface, (self.rect.x + 5, self.rect.y + 5))
