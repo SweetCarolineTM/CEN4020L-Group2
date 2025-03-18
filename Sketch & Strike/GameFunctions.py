@@ -8,6 +8,8 @@ from PasswordBox import PasswordBox
 from Text import Text
 from Network import Network
 
+import subprocess
+
 # game functionalities and player movement/info sending
 
 def mainMenu(window, clock, fps):
@@ -105,14 +107,45 @@ def hostGame(window, clock, fps, public_ip, port):
     portText.x, portText.y = portText.text_rect.topleft
     """
 
-    return -1
+    subprocess.Popen(["python", "Server.py", port]) #pass the port too
+    #print(f"Hosting game at {public_ip}:{port}")
+    return 1
 
 def joinGame(window, clock, fps, ip, port):
     #attempt to connect to the ip and port and then start the game loop
     
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        client.connect((ip, int(port)))
+        print(f"Connected to {ip}:{port}")
+        client.send(str.encode("Hello from client"))
+        response = client.recv(2048).decode()
+        
+        while True:
+            response = client.recv(2048).decode()
+            if not response:
+                print("Server closed the connection.")
+                break
 
-    return -1
+            print(f"Server says: {response}")
 
+            # Example: Allow the client to send new messages dynamically
+            message = input("Enter message to send (or 'exit' to disconnect): ")
+            if message.lower() == "exit":
+                print("Disconnecting from server.")
+                break
+
+            client.send(str.encode(message))
+        
+        #print(f"Server says: {response}")
+        #then the client side closes after sending the message
+    except Exception as e:
+        print("Failed to connect {e}")
+
+    finally: # or just have exception return -1
+        client.close()
+        print("Connection closed.")
+    return 1
 
 
 
