@@ -34,6 +34,7 @@ def main():
 
         if status == "hostGame":
             result = hostGame(window, clock, fps, public_ip, port)
+            #joinGame(window,clock,fps,ip,port) #beucase this is getting the ip and address from mainMenu, so we need to get this info from server class
 
         elif status == "joinGame":
             result = joinGame(window, clock, fps, ip, port)

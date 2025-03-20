@@ -9,6 +9,7 @@ from Text import Text
 from Network import Network
 
 import subprocess
+import time
 
 # game functionalities and player movement/info sending
 
@@ -82,8 +83,8 @@ def mainMenu(window, clock, fps):
 
 def hostGame(window, clock, fps, public_ip, port):
     subprocess.Popen(["python", "Server.py", port]) #starter the server
-    #then should go to this game screen, in public_ip:port
-    #joinGame(window,clock,fps,public_ip,port)
+    #print(f"public ip:{public_ip}") #so public ip is different than the *server started ip*, because this is sorced from the socket and not requests.get
+    joinGame(window,clock,fps,socket.gethostbyname(socket.gethostname()),port)
     return 1
 
 def joinGame(window, clock, fps, ip, port):
