@@ -16,25 +16,42 @@ except socket.error as e:
 s.listen(2)
 print(f"Server started at {server}:{port}") #You want the connecting client to join via this ip and port
 
+players = [(50, 50), (200, 200)]
+clients = []
+
 def threaded_client(conn, player):
+    global players
+    
     conn.send(str.encode("Connected"))
     while True:
         try:
-            data = conn.recv(2048).decode()
+            data = conn.recv(4096).decode()
             if not data:
-                print("Disconnected")
+                print(f" {player} Disconnected")
                 break
-            print(f"Player {player} sent: {data}")
-            conn.sendall(str.encode(f"Player {player}: {data}"))
-        except Exception as e:
-            print(f"error with {player}")
-            break
-    print(f"Connection closed for {player}") #the message is sent then the client exits
-    conn.close()
+            
+            x, y = map(int, data.split(","))
+            players[player] = (x, y)  #Update player position
 
-currentPlayer = 0
-while True:
+            #Send the other player's position back
+            other_player = 1 if player == 0 else 0
+            reply = f"{players[other_player][0]},{players[other_player][1]}"
+            conn.sendall(str.encode(reply))
+
+        except:
+            print(f"Connection lost with Player {player_id}")
+            break
+
+    conn.close()
+    if conn in clients:
+        clients.remove(conn) #connection closed
+
+while True: #accepts the clients to the server
     conn, addr = s.accept()
-    print(f"Connected to: {addr}")
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    if len(clients) < 2:
+        clients.append(conn)
+        player_id = len(clients) - 1
+        print(f"Player {player_id} connected from {addr}")
+        start_new_thread(threaded_client, (conn, player_id))
+    else:
+        conn.close()

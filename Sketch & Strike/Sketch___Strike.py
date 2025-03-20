@@ -27,46 +27,19 @@ def main():
 
     #this will display the main menu, then try to host or join a game
     #when the game is over or if it fails to connect, it will restart the loop and return to the main menu
+    
+    # result = -1(conn failed), 0 (tie), 1(1 won), 2(2 won)
     while True:
         ip, port, status = mainMenu(window, clock, fps)
 
         if status == "hostGame":
             result = hostGame(window, clock, fps, public_ip, port)
 
-            #use this to display the result of the game or just go back to main menu if the connection failed
-            """
-            if result == -1:
-                pass
-                #connection failed
-            elif result == 0:
-                pass
-                #it was a tie
-            elif result == 1:
-                pass
-                #player 1 won
-            elif result == 2:
-                pass
-                #player 2 won
-            """
         elif status == "joinGame":
             result = joinGame(window, clock, fps, ip, port)
 
-            #use this to display the result of the game or just go back to main menu if the connection failed
-            """
-            if result == -1:
-                pass
-                #connection failed
-            elif result == 0:
-                pass
-                #it was a tie
-            elif result == 1:
-                pass
-                #player 1 won
-            elif result == 2:
-                pass
-                #player 2 won
-            """
-
+        if result == -1:
+            continue  # If connection failed, return to menu
 main()
 
 pygame.quit()

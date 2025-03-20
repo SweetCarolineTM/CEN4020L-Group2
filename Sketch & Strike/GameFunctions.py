@@ -81,98 +81,54 @@ def mainMenu(window, clock, fps):
     sys.exit()
 
 def hostGame(window, clock, fps, public_ip, port):
-    
-    #copied and pasted your player movement code here so its available for you
-    
-    #n = Network()   
-    """startPos = read_pos(n.getPos())
-    p1 = Player(startPos[0],startPos[1],100,100,(0,255,0))
-    p2 = Player(0,0,100,100,(255,0,0))"""
-    """p2Pos = read_pos(n.send(make_pos((p1.x, p1.y))))
-    p2.x = p2Pos[0]
-    p2.y = p2Pos[1]
-    p2.update()
-    p1.move()
-    """
-
-    #needed to display the host's ip and port so they can tell the client
-    #have it display within the loop until the connection is made, then make it invisible and set a flag so that the game itself starts running
-    """
-    ipText = Text("Your IP: " + public_ip, 300, 100, font_size=40, color=(255, 0, 0))
-    ipText.text_rect.centerx = window.get_width() // 2
-    ipText.x, ipText.y = ipText.text_rect.topleft
-            
-    portText = Text("Your port: " + port, 300, 200, font_size=40, color=(255, 0, 0))
-    portText.text_rect.centerx = window.get_width() // 2
-    portText.x, portText.y = portText.text_rect.topleft
-    """
-
-    subprocess.Popen(["python", "Server.py", port]) #pass the port too
-    #print(f"Hosting game at {public_ip}:{port}")
+    subprocess.Popen(["python", "Server.py", port]) #starter the server
+    #then should go to this game screen, in public_ip:port
+    #joinGame(window,clock,fps,public_ip,port)
     return 1
 
 def joinGame(window, clock, fps, ip, port):
-    #attempt to connect to the ip and port and then start the game loop
-    
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client.connect((ip, int(port)))
         print(f"Connected to {ip}:{port}")
-        client.send(str.encode("Hello from client"))
-        response = client.recv(2048).decode()
         
-        while True:
-            response = client.recv(2048).decode()
-            if not response:
-                print("Server closed the connection.")
-                break
-
-            print(f"Server says: {response}")
-
-            # Example: Allow the client to send new messages dynamically
-            message = input("Enter message to send (or 'exit' to disconnect): ")
-            if message.lower() == "exit":
-                print("Disconnecting from server.")
-                break
-
-            client.send(str.encode(message))
+        player1 = Player(100, 100, 100, 100, pygame.Color("green"))
+        player2 = Player(0, 0, 100, 100, pygame.Color("red"))
         
-        #print(f"Server says: {response}")
-        #then the client side closes after sending the message
+        
+        #we have another game loop in here, to go to the main game
+        running = True
+        while running:
+            clock.tick(fps)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
+            
+            player1.move()
+            
+            # Send player position to the server
+            client.send(f"{player1.x},{player1.y}".encode())
+            
+            # Receive player2's position from the server
+            try:
+                data = client.recv(4096).decode()
+                if data:
+                    player2x, player2y = map(int, data.split(","))
+                    player2.x, player2.y = player2x, player2y
+                    player2.update()
+            except:
+                pass
+            
+            # Draw players on the window
+            window.fill((255, 255, 255))  # Clear screen
+            player1.draw(window)
+            player2.draw(window)
+            pygame.display.update()
+        
     except Exception as e:
-        print("Failed to connect {e}")
-
-    finally: # or just have exception return -1
+        print(f"Failed to connect: {e}")
+    finally:
         client.close()
         print("Connection closed.")
     return 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# i left your network functions down here to separate them from the game functions
-
-def read_pos(str):
-    str = str.split(",")
-    return int(str[0]), int(str[1])
-
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1])
-
-
-def redrawWindow(window, player1, player2):
-    window.fill((255,255,255))
-    player1.draw(window)
-    player2.draw(window)
-    pygame.display.update()
