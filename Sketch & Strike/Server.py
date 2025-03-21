@@ -20,31 +20,39 @@ players = [(50, 50), (200, 200)]
 clients = []
 
 def threaded_client(conn, player):
-    global players
-    
+    global players, clients
     conn.send(str.encode("Connected"))
+
     while True:
         try:
             data = conn.recv(4096).decode()
             if not data:
-                print(f" {player} Disconnected")
+                print(f"Player {player} Disconnected")
                 break
-            
-            x, y = map(int, data.split(","))
-            players[player] = (x, y)  #Update player position
 
-            #Send the other player's position back
+            x, y = map(int, data.split(","))
+            players[player] = (x, y)
+
             other_player = 1 if player == 0 else 0
             reply = f"{players[other_player][0]},{players[other_player][1]}"
             conn.sendall(str.encode(reply))
 
         except:
-            print(f"Connection lost with Player {player_id}")
+            print(f"Connection lost with Player {player}")
             break
 
     conn.close()
+    
+    # Remove the client from the list
     if conn in clients:
-        clients.remove(conn) #connection closed
+        clients.remove(conn)
+
+    # If all clients have disconnected, shut down the server
+    if len(clients) == 0:
+        print("No more clients connected. Shutting down server.")
+        s.close()
+        sys.exit()
+
 
 while True: #accepts the clients to the server
     conn, addr = s.accept()

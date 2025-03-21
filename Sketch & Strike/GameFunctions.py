@@ -2,6 +2,7 @@ import sys
 import socket 
 import pygame
 import requests
+import os
 from Button import Button
 from Player import Player
 from PasswordBox import PasswordBox
@@ -82,7 +83,10 @@ def mainMenu(window, clock, fps):
     sys.exit()
 
 def hostGame(window, clock, fps, public_ip, port):
-    subprocess.Popen(["python", "Server.py", port]) #starter the server
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the current script's directory
+    subprocess.Popen([sys.executable, "Server.py", str(port)], cwd=script_dir)
+
+    #subprocess.Popen(["python", "Server.py", port]) #starter the server
     #print(f"public ip:{public_ip}") #so public ip is different than the *server started ip*, because this is sorced from the socket and not requests.get
     joinGame(window,clock,fps,socket.gethostbyname(socket.gethostname()),port)
     return 1
@@ -104,6 +108,8 @@ def joinGame(window, clock, fps, ip, port):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    pygame.quit()
+                    sys.exit()
                     break
             
             player1.move()
