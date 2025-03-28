@@ -1,67 +1,65 @@
 import socket
 from _thread import *
 import sys
+from tkinter import CURRENT
 
-#first, run this server script in order to run endless client scripts
+server = socket.gethostbyname(socket.gethostname()) 
+port = int(sys.argv[1]) if int(sys.argv[1]) >= 5000 else 5555 #otherwise just use 5555 if the port entered is too small
 
-server = "10.135.52.63" #use local ip of your machine, w/ ipconfig in terminal
-port = 5555
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #inet represents the type of ipv4, and sock stream how string comes in 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     s.bind((server, port))
 except socket.error as e:
-    str(e)
+    print(str(e))
 
 s.listen(2)
-print("Waiting for a connection, Server Started")
+print(f"Server started at {server}:{port}") #You want the connecting client to join via this ip and port
 
-def read_pos(str):
-    str = str.split(",")
-    return int(str[0]), int(str[1])
-
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1])
-
-pos = [(0,0),(100,100)]
+players = [(50, 50), (200, 200)]
+clients = []
 
 def threaded_client(conn, player):
-    conn.send(str.encode(make_pos(pos[player])))
-    reply = ""
+    global players, clients
+    conn.send(str.encode("Connected"))
+
     while True:
         try:
-            data = read_pos(conn.recv(2048).decode())
-            pos[player] = data
-
+            data = conn.recv(4096).decode()
             if not data:
-                print("Disconnected")
+                print(f"Player {player} Disconnected")
                 break
-            else:
-                if player == 1:
-                    reply = pos[0]
-                else:
-                    reply = pos[1]
 
-                print("Received: ", data)
-                print("Sending : ", reply)
+            x, y = map(int, data.split(","))
+            players[player] = (x, y)
 
-            conn.sendall(str.encode(make_pos(reply)))
+            other_player = 1 if player == 0 else 0
+            reply = f"{players[other_player][0]},{players[other_player][1]}"
+            conn.sendall(str.encode(reply))
+
         except:
+            print(f"Connection lost with Player {player}")
             break
 
-    print("Lost connection")
     conn.close()
+    
+    # Remove the client from the list
+    if conn in clients:
+        clients.remove(conn)
 
-currentPlayer = 0
-while True:
+    # If all clients have disconnected, shut down the server
+    if len(clients) == 0:
+        print("No more clients connected. Shutting down server.")
+        s.close()
+        sys.exit()
+
+
+while True: #accepts the clients to the server
     conn, addr = s.accept()
-    print("Connected to:", addr)
-
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
-
-
-def hostGame():
-    pass #work on later
+    if len(clients) < 2:
+        clients.append(conn)
+        player_id = len(clients) - 1
+        print(f"Player {player_id} connected from {addr}")
+        start_new_thread(threaded_client, (conn, player_id))
+    else:
+        conn.close()
