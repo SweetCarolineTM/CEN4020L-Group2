@@ -7,7 +7,6 @@ from Button import Button
 from Player import Player
 from PasswordBox import PasswordBox
 from Text import Text
-from Network import Network
 
 import subprocess
 import time
