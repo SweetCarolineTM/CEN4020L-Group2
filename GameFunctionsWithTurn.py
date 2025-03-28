@@ -1,6 +1,7 @@
 #This file is the GameFunctions.py with the updated turn implementation, replace the GameFuncitons.py with
 #this file when this file is complete (rename back to GameFunctions.py in main)
 # game functions
+from Weapons import *
 import socket 
 import pygame
 import Button
@@ -10,7 +11,7 @@ import Button
 #player and game functionalities
 
 class Player():
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height, color, Weapon):
         self.x = x
         self.y = y
         self.width = width
@@ -18,6 +19,7 @@ class Player():
         self.color = color
         self.rect = (x,y,width,height)
         self.vel = 3
+        self.Weapon = Weapon
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, self.rect)
@@ -41,6 +43,30 @@ class Player():
 
     def update(self):
         self.rect = (self.x, self.y, self.width, self.height)
+
+    def chooseWeapon(self):
+        # Create a dictionary to store the weapons
+        weapons = {
+            "1": bow_and_arrow,
+            "2": fireball,
+            "3": sword
+        }
+
+        #show the choices
+        print("Choose your weapon:")
+        for key, weapon in weapons.items():
+            print(f"{key} - {weapon.weapon_type}")
+
+        choice = input("Enter the number of your weapon: ")
+
+        # Get weapon choice
+        chosenWeapon = weapons.get(choice)
+
+        if chosenWeapon:
+            print(f"\nYou chose {chosenWeapon.weapon_type}!")
+            self.weapon = chosenWeapon  # Directly equip the weapon
+        else:
+            print("Invalid choice \n")
 
     def turn (self):
         chooseWeapon(self)
