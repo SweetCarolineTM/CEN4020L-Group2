@@ -17,12 +17,15 @@ class Player():
         self.rect = (x,y,width,height)
         self.vel = 3
 
-    # Pymunk body for physics?
-    self.body = pymunk.Body(1, pymunk.moment_for_box(1, (width, height))
-    self.body.position = (x, y)
-    self.shape = pymunk.Poly.create_box(self.body, (width, height))
-    self.shape.elasticity = 0.4
-    self.shape.friction = 0.8
+        # Pymunk body for physics?
+        mass = 1
+        moment = pymunk.moment_for_box(mass, (width, height))
+        self.body = pymunk.Body(mass, moment) 
+        self.body.position = (x, y)
+
+        self.shape = pymunk.Poly.create_box(self.body, (width, height))
+        self.shape.elasticity = 0.4
+        self.shape.friction = 0.8
     
     def draw(self, win):
         pygame.draw.rect(win, self.color, self.rect)
