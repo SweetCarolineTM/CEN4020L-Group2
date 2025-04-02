@@ -2,7 +2,6 @@
 from Button import Button
 from PasswordBox import PasswordBox
 from Player import Player
-from Network import Network # type: ignore
 from GameFunctions import *
 from Text import Text
 
