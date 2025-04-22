@@ -8,32 +8,40 @@ class Player():
         self.width = width
         self.height = height
         self.color = color
-        self.rect = (x,y,width,height)
+        self.rect = pygame.Rect(x,y,width,height)
         self.vel = 3
         self.Weapon = Weapon
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, self.rect)
-
-    def move(self):
+        
+    def check_collision(self, other):
+        return self.rect.colliderect(other.rect)
+    
+    def move(self, other=None):
         keys = pygame.key.get_pressed()
+        old_x, old_y = self.x, self.y
 
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] and self.x - self.vel >= 0:
             self.x -= self.vel
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and self.x + self.vel + self.width <= 800:
             self.x += self.vel
 
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] and self.y - self.vel >= 0:
             self.y -= self.vel
 
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] and self.y + self.vel + self.height <= 600:
             self.y += self.vel
 
         self.update()
+        
+        if other and self.check_collision(other):
+            self.x, self.y = old_x, old_y
+            self.update()
 
     def update(self):
-        self.rect = (self.x, self.y, self.width, self.height)
+        self.rect.topleft = (self.x, self.y)
         
     def chooseWeapon(self):
         #this function will need to be updated to work with the UI in the game, ideally the player

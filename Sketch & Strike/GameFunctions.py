@@ -112,7 +112,7 @@ def joinGame(window, clock, fps, ip, port):
                     sys.exit()
                     break
             
-            player1.move()
+            player1.move(player2)
             
             # Send player position to the server
             client.send(f"{player1.x},{player1.y}".encode())
