@@ -5,6 +5,7 @@ import requests
 import os
 from Button import Button
 from Player import Player
+from Weapons import *
 from PasswordBox import PasswordBox
 from Text import Text
 
